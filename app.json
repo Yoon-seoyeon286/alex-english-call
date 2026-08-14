@@ -15,6 +15,7 @@
       "package": "com.gayeon.alexcall",
       "versionCode": 1,
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#08090C"
       },
       "permissions": [
@@ -24,9 +25,11 @@
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.WAKE_LOCK",
         "android.permission.BLUETOOTH_CONNECT",
-        "android.permission.CAMERA",
-        "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.BLUETOOTH"
+      ],
+      "blockedPermissions": [
+        "android.permission.CAMERA",
+        "android.permission.SYSTEM_ALERT_WINDOW"
       ]
     },
     "ios": {
@@ -61,8 +64,10 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#08090C",
-          "resizeMode": "contain"
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#08090C"
         }
       ]
     ],
@@ -74,6 +79,7 @@
       "eas": {
         "projectId": "e782b483-e9a6-4b1d-af26-ca86de5a4709"
       }
-    }
+    },
+    "icon": "./assets/icon.png"
   }
 }
