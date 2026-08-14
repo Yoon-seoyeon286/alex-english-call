@@ -36,7 +36,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const wanted = Array.from(new Set([REALTIME_MODEL, TEXT_MODEL, FAST_MODEL]));
+    // `?list=1` dumps every model id this key can see, so an unavailable
+    // default can be replaced with a real one instead of a guess.
+    if (req.query.list) {
+      const r = await fetch('https://api.openai.com/v1/models', {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      const body = (await r.json()) as { data?: Array<{ id: string }> };
+      res.status(200).json({
+        ok: r.ok,
+        config,
+        models: (body.data ?? []).map((m) => m.id).sort(),
+      });
+      return;
+    }
+
+    // `?models=a,b` lets you probe candidate model ids against this key
+    // without redeploying — handy when a default turns out to be unavailable.
+    const probe = typeof req.query.models === 'string' ? req.query.models.split(',') : [];
+    const wanted = Array.from(
+      new Set([REALTIME_MODEL, TEXT_MODEL, FAST_MODEL, ...probe].map((m) => m.trim()).filter(Boolean)),
+    );
     const checks = await Promise.all(
       wanted.map(async (model) => {
         const r = await fetch(`https://api.openai.com/v1/models/${encodeURIComponent(model)}`, {

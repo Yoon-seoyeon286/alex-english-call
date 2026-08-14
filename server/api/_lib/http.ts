@@ -2,8 +2,10 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export const REALTIME_MODEL = process.env.OPENAI_REALTIME_MODEL ?? 'gpt-realtime-2.1';
 export const REALTIME_VOICE = process.env.OPENAI_REALTIME_VOICE ?? 'cedar';
-export const TEXT_MODEL = process.env.OPENAI_TEXT_MODEL ?? 'gpt-5.6';
-export const FAST_MODEL = process.env.OPENAI_FAST_MODEL ?? TEXT_MODEL;
+export const TEXT_MODEL = process.env.OPENAI_TEXT_MODEL ?? 'gpt-5.5';
+// Hints are on the critical path of a live call, so they run on a smaller,
+// faster model than the post-call teacher analysis.
+export const FAST_MODEL = process.env.OPENAI_FAST_MODEL ?? 'gpt-5.4-mini';
 
 export class HttpError extends Error {
   constructor(
