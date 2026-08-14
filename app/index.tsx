@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 
@@ -7,7 +7,7 @@ import { Button } from '@/components/Button';
 import { Card, Empty, SectionLabel } from '@/components/Card';
 import { MemoryCard } from '@/features/memory/MemoryCard';
 import { retrieveForHome, type ScoredMemory } from '@/services/memory/retrieval';
-import { listRecentSessions } from '@/services/database/repositories/sessions';
+import { deleteSession, listRecentSessions } from '@/services/database/repositories/sessions';
 import { AI_NAME, isBackendConfigured } from '@/services/openai/config';
 import { formatDuration, formatFriendlyDate, formatRelativeDay } from '@/utils/date';
 import type { Session } from '@/types';
@@ -34,6 +34,26 @@ export default function HomeScreen() {
     await load();
     setRefreshing(false);
   }, [load]);
+
+  const confirmDelete = useCallback(
+    (id: string) => {
+      Alert.alert(
+        '이 리포트를 삭제할까요?',
+        '대화 내용과 점수, 교정 기록이 지워집니다. 저장한 표현과 Alex의 기억은 그대로 남아요.',
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '삭제',
+            style: 'destructive',
+            onPress: () => {
+              void deleteSession(id).then(load);
+            },
+          },
+        ],
+      );
+    },
+    [load],
+  );
 
   const configured = isBackendConfigured();
 
@@ -86,7 +106,11 @@ export default function HomeScreen() {
             ) : (
               <View className="gap-2">
                 {sessions.map((s) => (
-                  <Card key={s.id} onPress={() => router.push(`/review/${s.id}`)}>
+                  <Card
+                    key={s.id}
+                    onPress={() => router.push(`/review/${s.id}`)}
+                    onLongPress={() => confirmDelete(s.id)}
+                  >
                     <View className="flex-row items-center justify-between">
                       <View className="flex-1 pr-3">
                         <Text className="text-base font-medium text-white">
@@ -94,8 +118,8 @@ export default function HomeScreen() {
                         </Text>
                         <Text className="mt-0.5 text-xs text-muted">
                           {formatDuration(s.duration)}
-                          {s.analysisStatus === 'failed' ? ' · review unavailable' : ''}
-                          {s.analysisStatus === 'pending' ? ' · analysing…' : ''}
+                          {s.analysisStatus === 'failed' ? ' · 분석 실패' : ''}
+                          {s.analysisStatus === 'pending' ? ' · 분석 중…' : ''}
                         </Text>
                       </View>
                       {s.overallScore != null ? (
@@ -106,6 +130,9 @@ export default function HomeScreen() {
                     </View>
                   </Card>
                 ))}
+                <Text className="mt-1 text-center text-[11px] text-muted">
+                  길게 누르면 삭제할 수 있어요
+                </Text>
               </View>
             )}
           </View>

@@ -123,6 +123,25 @@ export async function deleteEmptySession(sessionId: string): Promise<boolean> {
   return true;
 }
 
+/**
+ * Removes one call and everything the review screen showed for it.
+ *
+ * Two deliberate exceptions: saved expressions are kept (they were worth
+ * keeping regardless of which call produced them, so they only lose their
+ * sessionId), and conversation memories are left alone — deleting a report
+ * should not make Alex forget your life.
+ */
+export async function deleteSession(sessionId: string): Promise<void> {
+  const db = getDatabase();
+  await db.withTransactionAsync(async () => {
+    await db.runAsync(`UPDATE expressions SET sessionId = NULL WHERE sessionId = ?`, sessionId);
+    await db.runAsync(`DELETE FROM utterances WHERE sessionId = ?`, sessionId);
+    await db.runAsync(`DELETE FROM corrections WHERE sessionId = ?`, sessionId);
+    await db.runAsync(`DELETE FROM sessionScores WHERE sessionId = ?`, sessionId);
+    await db.runAsync(`DELETE FROM sessions WHERE id = ?`, sessionId);
+  });
+}
+
 export async function addUtterance(
   sessionId: string,
   speaker: Speaker,

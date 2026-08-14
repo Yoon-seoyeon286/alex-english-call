@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 
@@ -7,7 +7,11 @@ import { Button } from '@/components/Button';
 import { BigScore, ScoreBar } from '@/components/ScoreBar';
 import { Card, SectionLabel } from '@/components/Card';
 import { CorrectionCard } from '@/features/review/CorrectionCard';
-import { getSession, getTranscript } from '@/services/database/repositories/sessions';
+import {
+  deleteSession,
+  getSession,
+  getTranscript,
+} from '@/services/database/repositories/sessions';
 import { getCorrections, getScores } from '@/services/database/repositories/analysis';
 import { retryAnalysis } from '@/services/analysis/postCall';
 import { AI_NAME } from '@/services/openai/config';
@@ -65,6 +69,24 @@ export default function ReviewScreen() {
   }, [sessionId, load]);
 
   const goHome = useCallback(() => router.replace('/'), []);
+
+  const onDelete = useCallback(() => {
+    if (!sessionId) return;
+    Alert.alert(
+      '이 리포트를 삭제할까요?',
+      '대화 내용과 점수, 교정 기록이 지워집니다. 저장한 표현과 Alex의 기억은 그대로 남아요.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: () => {
+            void deleteSession(sessionId).then(goHome);
+          },
+        },
+      ],
+    );
+  }, [sessionId, goHome]);
 
   if (!session) {
     return (
@@ -213,6 +235,10 @@ export default function ReviewScreen() {
           <View className="mt-8">
             <Button label="홈으로" variant="secondary" onPress={goHome} />
           </View>
+
+          <Pressable className="mt-4 items-center py-3" onPress={onDelete} hitSlop={6}>
+            <Text className="text-sm text-danger">이 리포트 삭제</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>

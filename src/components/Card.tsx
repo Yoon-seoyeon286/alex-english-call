@@ -4,14 +4,15 @@ import { Pressable, Text, View } from 'react-native';
 interface CardProps {
   children: ReactNode;
   onPress?: () => void;
+  onLongPress?: () => void;
   className?: string;
 }
 
-export function Card({ children, onPress, className = '' }: CardProps) {
+export function Card({ children, onPress, onLongPress, className = '' }: CardProps) {
   const base = `rounded-2xl bg-ink-800 p-4 ${className}`;
-  if (onPress) {
+  if (onPress || onLongPress) {
     return (
-      <Pressable onPress={onPress} className={`${base} active:bg-ink-700`}>
+      <Pressable onPress={onPress} onLongPress={onLongPress} className={`${base} active:bg-ink-700`}>
         {children}
       </Pressable>
     );
