@@ -8,7 +8,10 @@
       "android": {
         "image": "latest"
       },
-      "node": "22.23.2"
+      "node": "22.23.2",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://alex-english-call.vercel.app"
+      }
     },
     "development": {
       "extends": "base",
@@ -17,10 +20,6 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleDebug"
-      },
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://REPLACE-ME.vercel.app",
-        "EXPO_PUBLIC_APP_TOKEN": "REPLACE-ME"
       }
     },
     "preview": {
@@ -28,20 +27,12 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://REPLACE-ME.vercel.app",
-        "EXPO_PUBLIC_APP_TOKEN": "REPLACE-ME"
       }
     },
     "production": {
       "extends": "base",
       "android": {
         "buildType": "app-bundle"
-      },
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://REPLACE-ME.vercel.app",
-        "EXPO_PUBLIC_APP_TOKEN": "REPLACE-ME"
       }
     }
   },

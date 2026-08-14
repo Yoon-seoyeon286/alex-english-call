@@ -2,6 +2,7 @@
   "name": "alex-english-call-server",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Ephemeral-token + analysis backend for the Alex English calling app. Never proxies audio.",
   "scripts": {
     "dev": "vercel dev",

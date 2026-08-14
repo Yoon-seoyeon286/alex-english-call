@@ -51,15 +51,19 @@ curl -H "x-app-token: YOUR_APP_TOKEN" https://YOUR-URL.vercel.app/api/health
 
 You want `{"ok":true,...}`.
 
-### 2. Put those two values into `eas.json`
+### 2. Register the app token with EAS
 
-Replace **both** placeholders in every profile:
+`eas.json` already points at the deployed URL. The token is **not** committed —
+it lives as an EAS environment variable so this repo stays safe to push:
 
-```jsonc
-"env": {
-  "EXPO_PUBLIC_API_BASE_URL": "https://YOUR-URL.vercel.app",
-  "EXPO_PUBLIC_APP_TOKEN": "YOUR_APP_TOKEN"
-}
+```bash
+npx eas-cli login
+npx eas-cli env:create \
+  --scope project \
+  --name EXPO_PUBLIC_APP_TOKEN \
+  --value YOUR_APP_TOKEN \
+  --type sensitive \
+  --environment development --environment preview --environment production
 ```
 
 `EXPO_PUBLIC_*` values are visible inside the APK — that is fine here. The app
