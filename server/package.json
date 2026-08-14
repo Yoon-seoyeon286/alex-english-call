@@ -1,0 +1,17 @@
+{
+  "name": "alex-english-call-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ephemeral-token + analysis backend for the Alex English calling app. Never proxies audio.",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vercel/node": "^5.1.0",
+    "typescript": "~5.9.2",
+    "vercel": "^41.0.0"
+  }
+}
