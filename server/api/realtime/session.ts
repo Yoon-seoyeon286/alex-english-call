@@ -38,14 +38,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const model = body.model ?? REALTIME_MODEL;
     const voice = body.voice ?? REALTIME_VOICE;
 
-    const { value, expiresAt } = await createRealtimeClientSecret({
+    const tuned = {
       type: 'realtime',
       model,
       instructions,
       output_modalities: ['audio'],
       audio: {
+        // No explicit `format` here on purpose: over WebRTC the codec is
+        // negotiated in the SDP, and pinning PCM only applies to WebSocket
+        // transports.
         input: {
-          format: { type: 'audio/pcm', rate: 24000 },
           // Semantic VAD reads intonation, so it waits for the learner to
           // actually finish instead of cutting in on a mid-sentence pause.
           turn_detection: {
@@ -61,14 +63,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
         },
         output: {
-          format: { type: 'audio/pcm' },
           voice,
           speed: 1.0,
         },
       },
-    });
+    };
 
-    res.status(200).json({ value, expiresAt, model, voice });
+    /**
+     * If OpenAI ever renames or drops one of the tuning fields above, a 400
+     * would otherwise mean "no calls at all". Falling back to the minimal
+     * documented shape keeps the app usable — you just lose semantic VAD and
+     * live transcription until the config is updated.
+     */
+    const minimal = {
+      type: 'realtime',
+      model,
+      instructions,
+      audio: { output: { voice } },
+    };
+
+    let secret;
+    try {
+      secret = await createRealtimeClientSecret(tuned);
+    } catch (err) {
+      if (err instanceof HttpError && err.status !== 429) {
+        console.warn(`tuned session config rejected, retrying minimal: ${err.message}`);
+        secret = await createRealtimeClientSecret(minimal);
+      } else {
+        throw err;
+      }
+    }
+
+    res.status(200).json({
+      value: secret.value,
+      expiresAt: secret.expiresAt,
+      model,
+      voice,
+    });
   } catch (err) {
     sendError(res, err);
   }
