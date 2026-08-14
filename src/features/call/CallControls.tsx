@@ -13,7 +13,9 @@ function Icon({ name, color }: { name: IconName; color: string }) {
   };
 
   return (
-    <Svg width={24} height={24} viewBox="0 0 24 24">
+    // Without this the SVG host view swallows the touch on the New
+    // Architecture and the parent Pressable never fires.
+    <Svg width={24} height={24} viewBox="0 0 24 24" pointerEvents="none">
       {name === 'mic' || name === 'mic-off' ? (
         <>
           <Rect x={9} y={3} width={6} height={11} rx={3} {...common} />
@@ -57,12 +59,16 @@ function ControlButton({ label, icon, active, disabled, onPress }: ControlButton
       accessibilityState={{ disabled, selected: active }}
       onPress={disabled ? undefined : onPress}
       className="items-center"
-      hitSlop={8}
+      hitSlop={12}
+      // Press feedback has to live on the Pressable itself — a NativeWind
+      // `active:` on the child View never sees the press state.
+      style={({ pressed }) => ({ opacity: disabled ? 0.35 : pressed ? 0.6 : 1 })}
     >
       <View
+        pointerEvents="none"
         className={`h-16 w-16 items-center justify-center rounded-full ${
           active ? 'bg-white' : 'bg-ink-700'
-        } ${disabled ? 'opacity-35' : 'active:opacity-70'}`}
+        }`}
       >
         <Icon name={icon} color={active ? '#08090C' : '#FFFFFF'} />
       </View>
