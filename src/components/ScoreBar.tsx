@@ -32,7 +32,7 @@ export function BigScore({ score }: { score: number }) {
       <Text className="text-6xl font-bold" style={{ color: colorFor(clamped) }}>
         {clamped}
       </Text>
-      <Text className="mt-1 text-xs uppercase tracking-widest text-muted">Overall</Text>
+      <Text className="mt-1 text-xs tracking-widest text-muted">종합 점수</Text>
     </View>
   );
 }

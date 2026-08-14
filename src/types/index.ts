@@ -44,6 +44,9 @@ export interface Session {
   analysisStatus: 'pending' | 'done' | 'failed';
   analysisError: string | null;
   summary: string | null;
+  /** Korean-language feedback from the teacher agent. */
+  strengths: string[];
+  weaknesses: string[];
 }
 
 export interface Utterance {

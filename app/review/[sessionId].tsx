@@ -83,13 +83,13 @@ export default function ReviewScreen() {
         <View className="px-5 pt-3">
           <View className="flex-row items-center justify-between">
             <View>
-              <Text className="text-2xl font-bold text-white">Call review</Text>
+              <Text className="text-2xl font-bold text-white">통화 리뷰</Text>
               <Text className="mt-0.5 text-sm text-muted">
-                {formatDuration(session.duration)} with {AI_NAME}
+                {AI_NAME}와 {formatDuration(session.duration)} 통화
               </Text>
             </View>
             <Pressable onPress={goHome} hitSlop={10}>
-              <Text className="text-sm text-accent-soft">Done</Text>
+              <Text className="text-sm text-accent-soft">완료</Text>
             </Pressable>
           </View>
 
@@ -99,7 +99,7 @@ export default function ReviewScreen() {
               <View className="flex-row items-center">
                 <ActivityIndicator color="#5B8CFF" />
                 <Text className="ml-3 flex-1 text-sm leading-5 text-muted">
-                  Your transcript is saved. {AI_NAME} is going over the call…
+                  대화 내용은 저장됐어요. {AI_NAME}가 통화를 살펴보는 중이에요…
                 </Text>
               </View>
             </Card>
@@ -107,14 +107,14 @@ export default function ReviewScreen() {
 
           {failed ? (
             <View className="mt-6 rounded-2xl border border-danger/40 bg-danger/10 p-4">
-              <Text className="mb-1 text-sm font-semibold text-white">Review unavailable</Text>
+              <Text className="mb-1 text-sm font-semibold text-white">분석을 못 했어요</Text>
               <Text className="text-xs leading-5 text-muted">
-                Your transcript is safe — only the analysis failed.
+                대화 내용은 안전하게 저장돼 있어요. 분석만 실패했습니다.
                 {session.analysisError ? `\n\n${session.analysisError}` : ''}
               </Text>
               <View className="mt-3">
                 <Button
-                  label={retrying ? 'Retrying…' : 'Try again'}
+                  label={retrying ? '다시 시도 중…' : '다시 분석하기'}
                   loading={retrying}
                   variant="secondary"
                   onPress={onRetry}
@@ -132,11 +132,11 @@ export default function ReviewScreen() {
               <Card>
                 <BigScore score={session.overallScore ?? 0} />
                 <View className="mt-4">
-                  <ScoreBar label="Grammar" score={scores.grammar} />
-                  <ScoreBar label="Fluency" score={scores.fluency} />
-                  <ScoreBar label="Vocabulary" score={scores.vocabulary} />
-                  <ScoreBar label="Naturalness" score={scores.naturalness} />
-                  <ScoreBar label="Communication" score={scores.communication} />
+                  <ScoreBar label="문법" score={scores.grammar} />
+                  <ScoreBar label="유창성" score={scores.fluency} />
+                  <ScoreBar label="어휘" score={scores.vocabulary} />
+                  <ScoreBar label="자연스러움" score={scores.naturalness} />
+                  <ScoreBar label="의사전달" score={scores.communication} />
                 </View>
               </Card>
             </View>
@@ -150,10 +150,32 @@ export default function ReviewScreen() {
             </View>
           ) : null}
 
+          {session.strengths.length > 0 ? (
+            <View className="mt-8">
+              <SectionLabel>잘한 점</SectionLabel>
+              <Card>
+                {session.strengths.map((s, i) => (
+                  <Bullet key={`s-${i}`} text={s} color="#3FD08A" />
+                ))}
+              </Card>
+            </View>
+          ) : null}
+
+          {session.weaknesses.length > 0 ? (
+            <View className="mt-6">
+              <SectionLabel>아쉬운 점</SectionLabel>
+              <Card>
+                {session.weaknesses.map((w, i) => (
+                  <Bullet key={`w-${i}`} text={w} color="#E8B23A" />
+                ))}
+              </Card>
+            </View>
+          ) : null}
+
           {/* Corrections --------------------------------------------- */}
           {corrections.length > 0 ? (
             <View className="mt-8">
-              <SectionLabel>Worth fixing</SectionLabel>
+              <SectionLabel>고쳐볼 부분</SectionLabel>
               <View className="gap-3">
                 {corrections.map((c) => (
                   <CorrectionCard key={c.id} correction={c} />
@@ -166,7 +188,7 @@ export default function ReviewScreen() {
           <View className="mt-8">
             <Pressable onPress={() => setShowTranscript((v) => !v)} hitSlop={6}>
               <Text className="text-sm text-accent-soft">
-                {showTranscript ? 'Hide transcript' : `Show transcript (${transcript.length})`}
+                {showTranscript ? '대화 내용 숨기기' : `대화 내용 보기 (${transcript.length})`}
               </Text>
             </Pressable>
 
@@ -179,7 +201,7 @@ export default function ReviewScreen() {
                         u.speaker === 'AI' ? 'text-accent-soft' : 'text-muted'
                       }`}
                     >
-                      {u.speaker === 'AI' ? AI_NAME : 'You'}
+                      {u.speaker === 'AI' ? AI_NAME : '나'}
                     </Text>
                     <Text className="text-[15px] leading-5 text-white">{u.text}</Text>
                   </View>
@@ -189,10 +211,19 @@ export default function ReviewScreen() {
           </View>
 
           <View className="mt-8">
-            <Button label="Back home" variant="secondary" onPress={goHome} />
+            <Button label="홈으로" variant="secondary" onPress={goHome} />
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function Bullet({ text, color }: { text: string; color: string }) {
+  return (
+    <View className="mb-2.5 flex-row">
+      <View className="mr-2.5 mt-2 h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
+      <Text className="flex-1 text-[14px] leading-6 text-white">{text}</Text>
+    </View>
   );
 }

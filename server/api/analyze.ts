@@ -41,7 +41,14 @@ Rules:
 - strengths must quote or paraphrase things the learner actually said.
 - recommendedExpressions must fit the topics that came up in this specific call.
 - If the learner barely spoke, give low-confidence scores near 50 rather than inventing detail, keep corrections few, and say so in the summary.
-- Write everything in English.`;
+
+LANGUAGE — this matters:
+The learner is Korean. Everything you write ABOUT their English must be in natural, friendly Korean (존댓말, 해요체). Everything that IS English — the material they are meant to learn — stays in English.
+
+Korean: summary, strengths, weaknesses, corrections[].reason, recommendedExpressions[].meaning
+English: corrections[].original, corrections[].corrected, corrections[].natural, recommendedExpressions[].expression, recommendedExpressions[].example
+
+Write Korean the way a friendly tutor talks, not like a textbook. When you must name a grammar concept, use the everyday Korean term and put the English sentence in quotes rather than translating it. Never translate the learner's own words into Korean — quote them in English.`;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {

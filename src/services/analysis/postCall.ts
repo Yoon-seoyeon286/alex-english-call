@@ -95,6 +95,8 @@ export async function runPostCallPipeline(sessionId: string): Promise<PostCallOu
     await markAnalysis(sessionId, 'done', {
       overallScore: report.overallScore,
       summary: report.summary,
+      strengths: report.strengths ?? [],
+      weaknesses: report.weaknesses ?? [],
     });
     await refreshLearningProfile(report.levelEstimate);
 
@@ -146,6 +148,8 @@ export async function retryAnalysis(sessionId: string): Promise<TeacherReport> {
   await markAnalysis(sessionId, 'done', {
     overallScore: report.overallScore,
     summary: report.summary,
+    strengths: report.strengths ?? [],
+    weaknesses: report.weaknesses ?? [],
   });
   await refreshLearningProfile(report.levelEstimate);
 

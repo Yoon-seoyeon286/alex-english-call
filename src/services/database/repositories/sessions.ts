@@ -12,6 +12,19 @@ interface SessionRow {
   analysisStatus: string;
   analysisError: string | null;
   summary: string | null;
+  strengths: string | null;
+  weaknesses: string | null;
+}
+
+/** Columns added in migration v2 arrive as JSON text. */
+function parseList(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
 }
 
 function mapSession(row: SessionRow): Session {
@@ -24,6 +37,8 @@ function mapSession(row: SessionRow): Session {
     analysisStatus: (row.analysisStatus as Session['analysisStatus']) ?? 'pending',
     analysisError: row.analysisError,
     summary: row.summary,
+    strengths: parseList(row.strengths),
+    weaknesses: parseList(row.weaknesses),
   };
 }
 
@@ -56,17 +71,26 @@ export async function finishSession(
 export async function markAnalysis(
   sessionId: string,
   status: Session['analysisStatus'],
-  opts: { overallScore?: number | null; summary?: string | null; error?: string | null } = {},
+  opts: {
+    overallScore?: number | null;
+    summary?: string | null;
+    error?: string | null;
+    strengths?: string[];
+    weaknesses?: string[];
+  } = {},
 ): Promise<void> {
   const db = getDatabase();
   await db.runAsync(
     `UPDATE sessions
-     SET analysisStatus = ?, overallScore = ?, summary = ?, analysisError = ?
+     SET analysisStatus = ?, overallScore = ?, summary = ?, analysisError = ?,
+         strengths = ?, weaknesses = ?
      WHERE id = ?`,
     status,
     opts.overallScore ?? null,
     opts.summary ?? null,
     opts.error ?? null,
+    JSON.stringify(opts.strengths ?? []),
+    JSON.stringify(opts.weaknesses ?? []),
     sessionId,
   );
 }

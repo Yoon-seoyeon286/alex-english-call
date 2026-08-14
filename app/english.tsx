@@ -18,24 +18,24 @@ import { formatDuration, formatMinutes } from '@/utils/date';
 import type { Expression, LearningProfile } from '@/types';
 
 const CATEGORY_LABEL: Record<string, string> = {
-  grammar: 'Grammar',
-  tense: 'Tense',
-  article: 'Articles',
-  preposition: 'Prepositions',
-  word_choice: 'Word choice',
-  word_order: 'Word order',
-  plural: 'Plurals',
-  subject_verb_agreement: 'Agreement',
-  naturalness: 'Naturalness',
-  other: 'Other',
+  grammar: '문법',
+  tense: '시제',
+  article: '관사',
+  preposition: '전치사',
+  word_choice: '단어 선택',
+  word_order: '어순',
+  plural: '복수형',
+  subject_verb_agreement: '수 일치',
+  naturalness: '자연스러움',
+  other: '기타',
 };
 
 const LEVEL_LABEL: Record<string, string> = {
-  beginner: 'Beginner',
-  lower_intermediate: 'Lower intermediate',
-  intermediate: 'Intermediate',
-  upper_intermediate: 'Upper intermediate',
-  advanced: 'Advanced',
+  beginner: '입문',
+  lower_intermediate: '초중급',
+  intermediate: '중급',
+  upper_intermediate: '중상급',
+  advanced: '상급',
 };
 
 export default function MyEnglishScreen() {
@@ -73,44 +73,44 @@ export default function MyEnglishScreen() {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 32 }}>
         <View className="px-5 pt-3">
           <View className="flex-row items-center justify-between">
-            <Text className="text-2xl font-bold text-white">My English</Text>
+            <Text className="text-2xl font-bold text-white">내 영어</Text>
             <Pressable onPress={() => router.back()} hitSlop={10}>
-              <Text className="text-sm text-accent-soft">Done</Text>
+              <Text className="text-sm text-accent-soft">완료</Text>
             </Pressable>
           </View>
 
           {profile ? (
             <Text className="mt-1 text-sm text-muted">
-              Current level: {LEVEL_LABEL[profile.currentLevel] ?? profile.currentLevel}
+              현재 레벨: {LEVEL_LABEL[profile.currentLevel] ?? profile.currentLevel}
             </Text>
           ) : null}
 
           {!hasData ? (
             <View className="mt-8">
-              <Empty text="No calls yet. Your speaking stats show up here after your first conversation." />
+              <Empty text="아직 통화 기록이 없어요. 첫 통화가 끝나면 여기에 기록이 쌓입니다." />
             </View>
           ) : null}
 
           {/* Speaking stats ------------------------------------------ */}
           {stats && hasData ? (
             <View className="mt-7">
-              <SectionLabel>Speaking</SectionLabel>
+              <SectionLabel>말하기 기록</SectionLabel>
               <View className="gap-2.5">
                 <View className="flex-row gap-2.5">
-                  <StatTile label="Total speaking time" value={formatMinutes(stats.totalSeconds)} />
-                  <StatTile label="This week" value={formatMinutes(stats.weekSeconds)} />
+                  <StatTile label="총 통화 시간" value={formatMinutes(stats.totalSeconds)} />
+                  <StatTile label="이번 주" value={formatMinutes(stats.weekSeconds)} />
                 </View>
                 <View className="flex-row gap-2.5">
-                  <StatTile label="Total calls" value={`${stats.totalSessions}`} />
-                  <StatTile label="Words spoken" value={`${stats.totalWords}`} />
+                  <StatTile label="총 통화 수" value={`${stats.totalSessions}`} />
+                  <StatTile label="내가 말한 단어 수" value={`${stats.totalWords}`} />
                 </View>
                 <View className="flex-row gap-2.5">
                   <StatTile
-                    label="Average call length"
+                    label="평균 통화 시간"
                     value={formatDuration(stats.averageSeconds)}
                   />
                   <StatTile
-                    label="Saved expressions"
+                    label="저장한 표현"
                     value={`${expressions.length}`}
                   />
                 </View>
@@ -121,17 +121,17 @@ export default function MyEnglishScreen() {
           {/* Trends --------------------------------------------------- */}
           {trend.length > 0 ? (
             <View className="mt-8">
-              <SectionLabel>Trends</SectionLabel>
+              <SectionLabel>점수 추이</SectionLabel>
               <Card>
-                <TrendRow label="Grammar" values={trend.map((t) => t.grammar)} color="#5B8CFF" />
-                <TrendRow label="Fluency" values={trend.map((t) => t.fluency)} color="#3FD08A" />
+                <TrendRow label="문법" values={trend.map((t) => t.grammar)} color="#5B8CFF" />
+                <TrendRow label="유창성" values={trend.map((t) => t.fluency)} color="#3FD08A" />
                 <TrendRow
-                  label="Vocabulary"
+                  label="어휘"
                   values={trend.map((t) => t.vocabulary)}
                   color="#E8B23A"
                 />
                 <TrendRow
-                  label="Naturalness"
+                  label="자연스러움"
                   values={trend.map((t) => t.naturalness)}
                   color="#B98CFF"
                 />
@@ -142,7 +142,7 @@ export default function MyEnglishScreen() {
           {/* Repeat mistakes ------------------------------------------ */}
           {mistakes.length > 0 ? (
             <View className="mt-8">
-              <SectionLabel>What trips you up</SectionLabel>
+              <SectionLabel>자주 틀리는 부분</SectionLabel>
               <Card>
                 {mistakes.map((m, i) => (
                   <View
@@ -167,7 +167,7 @@ export default function MyEnglishScreen() {
           {/* Expressions ---------------------------------------------- */}
           {expressions.length > 0 ? (
             <View className="mt-8">
-              <SectionLabel>Expressions to keep</SectionLabel>
+              <SectionLabel>저장한 표현</SectionLabel>
               <View className="gap-2">
                 {expressions.map((e) => (
                   <Card key={e.id}>

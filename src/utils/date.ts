@@ -49,12 +49,13 @@ export function formatDuration(seconds: number): string {
   return `${m}:${`${rest}`.padStart(2, '0')}`;
 }
 
+/** Used on the Korean-language stats screens, so the unit is Korean too. */
 export function formatMinutes(seconds: number): string {
   const total = Math.floor(seconds / 60);
-  if (total < 60) return `${total}m`;
+  if (total < 60) return `${total}분`;
   const h = Math.floor(total / 60);
   const m = total % 60;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+  return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
 }
 
 export function formatFriendlyDate(date: Date = new Date()): string {

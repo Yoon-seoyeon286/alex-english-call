@@ -108,6 +108,15 @@ const MIGRATIONS: Array<{ version: number; sql: string }> = [
       );
     `,
   },
+  {
+    // The teacher already produced strengths/weaknesses; we just weren't
+    // keeping them. Stored as JSON arrays of Korean sentences.
+    version: 2,
+    sql: `
+      ALTER TABLE sessions ADD COLUMN strengths TEXT NOT NULL DEFAULT '[]';
+      ALTER TABLE sessions ADD COLUMN weaknesses TEXT NOT NULL DEFAULT '[]';
+    `,
+  },
 ];
 
 async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {

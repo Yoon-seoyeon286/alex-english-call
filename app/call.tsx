@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import { CallControls } from '@/features/call/CallControls';
+import { CaptionView } from '@/features/call/CaptionView';
 import { HintSheet } from '@/features/call/HintSheet';
 import { TranscriptPanel } from '@/features/call/TranscriptPanel';
 import { DebugLogSheet } from '@/features/call/DebugLogSheet';
@@ -112,8 +113,11 @@ export default function CallScreen() {
             <TranscriptPanel turns={turns} />
           </View>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <VoiceOrb status={status} level={level} />
+          <View className="flex-1 justify-center">
+            <View className="flex-1 items-center justify-center">
+              <VoiceOrb status={status} level={level} />
+            </View>
+            <CaptionView turns={turns} status={status} aiName={AI_NAME} />
           </View>
         )}
 
