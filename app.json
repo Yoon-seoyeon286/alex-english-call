@@ -1,0 +1,79 @@
+{
+  "expo": {
+    "name": "Alex",
+    "slug": "alex-english-call",
+    "scheme": "alexcall",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#08090C",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "owner": "yoon-seoyeon",
+    "android": {
+      "package": "com.gayeon.alexcall",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#08090C"
+      },
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.WAKE_LOCK",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.CAMERA",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.BLUETOOTH"
+      ]
+    },
+    "ios": {
+      "bundleIdentifier": "com.gayeon.alexcall",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Alex needs your microphone so you can talk with him in English."
+      },
+      "bitcode": false
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-dev-client",
+      [
+        "@config-plugins/react-native-webrtc",
+        {
+          "cameraPermission": false,
+          "microphonePermission": "Alex needs your microphone so you can talk with him in English."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26,
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36
+          }
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#08090C",
+          "resizeMode": "contain"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e782b483-e9a6-4b1d-af26-ca86de5a4709"
+      }
+    }
+  }
+}
