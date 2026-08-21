@@ -8,6 +8,7 @@ import { CaptionView } from '@/features/call/CaptionView';
 import { HintSheet } from '@/features/call/HintSheet';
 import { TranscriptPanel } from '@/features/call/TranscriptPanel';
 import { DebugLogSheet } from '@/features/call/DebugLogSheet';
+import { TranslationModal } from '@/features/call/TranslationModal';
 import { VoiceOrb } from '@/features/call/VoiceOrb';
 import { Button } from '@/components/Button';
 import { useCallStore } from '@/stores/callStore';
@@ -43,6 +44,7 @@ export default function CallScreen() {
 
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
+  const [translateOpen, setTranslateOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [ending, setEnding] = useState(false);
 
@@ -95,9 +97,20 @@ export default function CallScreen() {
     void requestHint();
   }, [clearHints, requestHint]);
 
+  const lastAiText = [...turns]
+    .reverse()
+    .find((t) => t.speaker === 'AI' && t.text.trim().length > 0 && !t.partial)?.text ?? '';
+
   const onTranslate = useCallback(() => {
-    void translateLastAiText();
-  }, [translateLastAiText]);
+    if (lastAiText) {
+      void translateLastAiText();
+    }
+    setTranslateOpen(true);
+  }, [lastAiText, translateLastAiText]);
+
+  const onCloseTranslate = useCallback(() => {
+    setTranslateOpen(false);
+  }, []);
 
   const controlsDisabled =
     status === 'CONNECTING' || status === 'ERROR' || status === 'ENDED' || status === 'IDLE';
@@ -129,9 +142,6 @@ export default function CallScreen() {
               turns={turns}
               status={status}
               aiName={AI_NAME}
-              translatedText={translatedText}
-              translating={translating}
-              translateError={translateError}
             />
           </View>
         )}
@@ -190,6 +200,14 @@ export default function CallScreen() {
         hints={hints}
         error={hintError}
         onClose={() => setHintOpen(false)}
+      />
+      <TranslationModal
+        visible={translateOpen}
+        originalText={lastAiText}
+        translatedText={translatedText}
+        translating={translating}
+        error={translateError}
+        onClose={onCloseTranslate}
       />
       <DebugLogSheet visible={debugOpen} onClose={() => setDebugOpen(false)} />
     </SafeAreaView>
