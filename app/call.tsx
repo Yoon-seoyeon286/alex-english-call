@@ -29,12 +29,16 @@ export default function CallScreen() {
   const hints = useCallStore((s) => s.hints);
   const hintLoading = useCallStore((s) => s.hintLoading);
   const hintError = useCallStore((s) => s.hintError);
+  const translatedText = useCallStore((s) => s.translatedText);
+  const translating = useCallStore((s) => s.translating);
+  const translateError = useCallStore((s) => s.translateError);
 
   const startCall = useCallStore((s) => s.startCall);
   const endCall = useCallStore((s) => s.endCall);
   const toggleMute = useCallStore((s) => s.toggleMute);
   const requestHint = useCallStore((s) => s.requestHint);
   const clearHints = useCallStore((s) => s.clearHints);
+  const translateLastAiText = useCallStore((s) => s.translateLastAiText);
   const reset = useCallStore((s) => s.reset);
 
   const [transcriptOpen, setTranscriptOpen] = useState(false);
@@ -91,6 +95,10 @@ export default function CallScreen() {
     void requestHint();
   }, [clearHints, requestHint]);
 
+  const onTranslate = useCallback(() => {
+    void translateLastAiText();
+  }, [translateLastAiText]);
+
   const controlsDisabled =
     status === 'CONNECTING' || status === 'ERROR' || status === 'ENDED' || status === 'IDLE';
 
@@ -117,7 +125,14 @@ export default function CallScreen() {
             <View className="flex-1 items-center justify-center">
               <VoiceOrb status={status} level={level} />
             </View>
-            <CaptionView turns={turns} status={status} aiName={AI_NAME} />
+            <CaptionView
+              turns={turns}
+              status={status}
+              aiName={AI_NAME}
+              translatedText={translatedText}
+              translating={translating}
+              translateError={translateError}
+            />
           </View>
         )}
 
@@ -161,6 +176,8 @@ export default function CallScreen() {
               onToggleMute={toggleMute}
               onToggleTranscript={() => setTranscriptOpen((v) => !v)}
               onHint={onHint}
+              onTranslate={onTranslate}
+              translateActive={!!translatedText}
               onEndCall={() => void finish()}
             />
           )}

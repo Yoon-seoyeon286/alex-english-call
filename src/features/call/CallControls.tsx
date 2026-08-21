@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 import Svg, { Line, Path, Rect } from 'react-native-svg';
 
-type IconName = 'mic' | 'mic-off' | 'transcript' | 'hint';
+type IconName = 'mic' | 'mic-off' | 'transcript' | 'hint' | 'translate';
 
 function Icon({ name, color }: { name: IconName; color: string }) {
   const common = {
@@ -37,6 +37,13 @@ function Icon({ name, color }: { name: IconName; color: string }) {
         <>
           <Path d="M9 17h6M10 20h4" {...common} />
           <Path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .8 1.6h5.6c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z" {...common} />
+        </>
+      ) : null}
+
+      {name === 'translate' ? (
+        <>
+          <Path d="M5 8h14M5 12h14M5 16h8" {...common} />
+          <Path d="M18 16l2-6 2 6M18.7 14.5h2.6" {...common} />
         </>
       ) : null}
     </Svg>
@@ -83,6 +90,8 @@ interface CallControlsProps {
   onToggleMute: () => void;
   onToggleTranscript: () => void;
   onHint: () => void;
+  onTranslate: () => void;
+  translateActive?: boolean;
   onEndCall: () => void;
   transcriptOpen: boolean;
 }
@@ -93,6 +102,8 @@ export function CallControls({
   onToggleMute,
   onToggleTranscript,
   onHint,
+  onTranslate,
+  translateActive,
   onEndCall,
   transcriptOpen,
 }: CallControlsProps) {
@@ -113,6 +124,13 @@ export function CallControls({
           onPress={onToggleTranscript}
         />
         <ControlButton label="Hint" icon="hint" disabled={disabled} onPress={onHint} />
+        <ControlButton
+          label="Translate"
+          icon="translate"
+          active={translateActive}
+          disabled={disabled}
+          onPress={onTranslate}
+        />
       </View>
 
       {/* Always enabled — hanging up must work even while connecting. */}

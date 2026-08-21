@@ -166,3 +166,16 @@ export const HINT_SCHEMA = {
     },
   },
 } as const;
+
+export const TRANSLATE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['translation'],
+  properties: {
+    translation: {
+      type: 'string',
+      description:
+        'Natural Korean translation of the sentence, in friendly 해요체. Preserve the tone (casual friend, warm).',
+    },
+  },
+} as const;

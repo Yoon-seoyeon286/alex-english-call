@@ -9,6 +9,7 @@ export type AppErrorCode =
   | 'analysis_failed'
   | 'extraction_failed'
   | 'hint_failed'
+  | 'translation_failed'
   | 'database_failed'
   | 'unknown';
 
@@ -38,6 +39,7 @@ const FRIENDLY: Record<AppErrorCode, string> = {
     "Your transcript is saved, but the review couldn't be generated. You can retry it any time.",
   extraction_failed: "Saved, but Alex couldn't structure it yet. It will be retried next time.",
   hint_failed: "Couldn't fetch a hint right now — the call is still connected.",
+  translation_failed: "Couldn't translate right now — the call is still connected.",
   database_failed: 'Local storage failed. Restarting the app usually fixes it.',
   unknown: 'Something went wrong.',
 };

@@ -146,6 +146,18 @@ export async function fetchHints(input: {
   }
 }
 
+export async function fetchTranslation(text: string): Promise<string> {
+  try {
+    const res = await request<{ translation: string }>('/api/translate', {
+      body: { text },
+      timeoutMs: 15000,
+    });
+    return res.translation ?? '';
+  } catch (err) {
+    throw new AppError('translation_failed', (err as Error).message, err);
+  }
+}
+
 export interface HealthReport {
   ok: boolean;
   reason?: string;

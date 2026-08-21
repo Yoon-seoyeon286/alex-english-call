@@ -13,7 +13,7 @@ import {
 } from '@/services/database/repositories/sessions';
 import { markMemoriesReferenced } from '@/services/database/repositories/memories';
 import { getLearningProfile } from '@/services/database/repositories/learningProfile';
-import { fetchHints } from '@/services/openai/client';
+import { fetchHints, fetchTranslation } from '@/services/openai/client';
 import { requestMicrophonePermission } from '@/hooks/usePermissions';
 import { AppError, friendlyMessage, toAppError } from '@/utils/errors';
 import { createLogger } from '@/utils/logger';
@@ -37,6 +37,10 @@ interface CallState {
   hintLoading: boolean;
   hintError: string | null;
 
+  translatedText: string;
+  translating: boolean;
+  translateError: string | null;
+
   /** Set when a finished call is ready for its review screen. */
   lastFinishedSessionId: string | null;
 
@@ -45,6 +49,8 @@ interface CallState {
   toggleMute: () => void;
   requestHint: () => Promise<void>;
   clearHints: () => void;
+  translateLastAiText: () => Promise<void>;
+  clearTranslation: () => void;
   dismissError: () => void;
   reset: () => void;
 }
@@ -72,6 +78,9 @@ export const useCallStore = create<CallState>((set, get) => ({
   hints: [],
   hintLoading: false,
   hintError: null,
+  translatedText: '',
+  translating: false,
+  translateError: null,
   lastFinishedSessionId: null,
 
   async startCall() {
@@ -88,7 +97,11 @@ export const useCallStore = create<CallState>((set, get) => ({
       errorMessage: null,
       errorCode: null,
       hints: [],
+      hintLoading: false,
       hintError: null,
+      translatedText: '',
+      translating: false,
+      translateError: null,
       lastFinishedSessionId: null,
     });
 
@@ -147,10 +160,18 @@ export const useCallStore = create<CallState>((set, get) => ({
       onTurnUpdate: (turn) => {
         set((state) => {
           const index = state.turns.findIndex((t) => t.id === turn.id);
-          if (index === -1) return { turns: [...state.turns, turn] };
-          const next = state.turns.slice();
-          next[index] = turn;
-          return { turns: next };
+          const isNewAiTurn =
+            turn.speaker === 'AI' && state.turns.every((t) => t.id !== turn.id);
+          const nextTurns =
+            index === -1
+              ? [...state.turns, turn]
+              : state.turns.map((t, i) => (i === index ? turn : t));
+          // A new AI turn means the previous translation is no longer relevant.
+          return {
+            turns: nextTurns,
+            translatedText: isNewAiTurn ? '' : state.translatedText,
+            translateError: isNewAiTurn ? null : state.translateError,
+          };
         });
       },
       onLevel: (level) => set({ level }),
@@ -264,6 +285,43 @@ export const useCallStore = create<CallState>((set, get) => ({
     set({ hints: [], hintError: null });
   },
 
+  translateLastAiText() {
+    // Find the last completed AI line and translate it.
+    const turns = get().turns;
+    const lastAi = [...turns]
+      .reverse()
+      .find((t) => t.speaker === 'AI' && t.text.trim().length > 0 && !t.partial);
+
+    if (!lastAi) {
+      set({ translateError: 'No finished Alex line to translate yet.' });
+      return Promise.resolve();
+    }
+
+    // If we already have a translation for this exact line, reuse it.
+    const state = get();
+    const existingSource = state.turns.find(
+      (t) => t.speaker === 'AI' && state.translatedText && t.text === lastAi.text,
+    );
+    if (existingSource && state.translatedText) {
+      return Promise.resolve();
+    }
+
+    set({ translating: true, translateError: null });
+    return fetchTranslation(lastAi.text)
+      .then((translation) => {
+        set({ translatedText: translation, translating: false });
+      })
+      .catch((err) => {
+        const appErr = toAppError(err, 'translation_failed');
+        log.warn('translation failed', appErr);
+        set({ translating: false, translateError: friendlyMessage(appErr) });
+      });
+  },
+
+  clearTranslation() {
+    set({ translatedText: '', translateError: null });
+  },
+
   dismissError() {
     set({ errorMessage: null, errorCode: null });
   },
@@ -285,6 +343,9 @@ export const useCallStore = create<CallState>((set, get) => ({
       hints: [],
       hintLoading: false,
       hintError: null,
+      translatedText: '',
+      translating: false,
+      translateError: null,
     });
   },
 }));

@@ -7,6 +7,9 @@ interface CaptionProps {
   turns: LiveTurn[];
   status: CallStatus;
   aiName: string;
+  translatedText?: string;
+  translating?: boolean;
+  translateError?: string | null;
 }
 
 /**
@@ -16,7 +19,7 @@ interface CaptionProps {
  * down and read it. So the caption keeps showing the last thing Alex said even
  * after he stops talking, and only clears when he starts a new turn.
  */
-export function CaptionView({ turns, status, aiName }: CaptionProps) {
+export function CaptionView({ turns, status, aiName, translatedText = '', translating = false, translateError = null }: CaptionProps) {
   const scroller = useRef<ScrollView>(null);
   const [userSpoke, setUserSpoke] = useState(false);
 
@@ -81,6 +84,20 @@ export function CaptionView({ turns, status, aiName }: CaptionProps) {
           </Text>
         </ScrollView>
       </View>
+
+      {translating || translatedText || translateError ? (
+        <View className="mt-2 px-3">
+          {translating ? (
+            <Text className="text-center text-sm text-accent-soft">번역 중…</Text>
+          ) : translateError ? (
+            <Text className="text-center text-sm text-danger">{translateError}</Text>
+          ) : (
+            <Text className="text-center text-sm leading-5 text-white">
+              {translatedText}
+            </Text>
+          )}
+        </View>
+      ) : null}
     </View>
   );
 }
